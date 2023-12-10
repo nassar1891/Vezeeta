@@ -70,9 +70,9 @@ namespace VezeetaAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeletePatient(int id)
+        public async Task<IActionResult> DeletePatient(int id)
         {
-            _patientRepository.Delete(id);
+            await _patientRepository.Delete(id);
             return Ok();
         }
     }

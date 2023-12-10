@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VezeetaAPI.Models;
-using VezeetaAPI.Interfaces;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using VezeetaAPI.Repositories;
 
 namespace VezeetaAPI.Controllers
@@ -45,6 +42,13 @@ namespace VezeetaAPI.Controllers
         public async Task<IActionResult> SearchDoctors(DoctorSearchCriteria criteria)
         {
             var doctors = await _doctorRepository.SearchDoctors(criteria);
+
+            return Ok(doctors);
+        }
+        [HttpGet("doctors")]
+        public async Task<IActionResult> GetDoctorsBySpecialization(string specialization)
+        {
+            var doctors = await _doctorRepository.GetDoctorsBySpecialization(specialization);
 
             return Ok(doctors);
         }

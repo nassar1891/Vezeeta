@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using VezeetaAPI.Models;
 using VezeetaAPI.Repositories;
 
@@ -11,10 +9,12 @@ namespace VezeetaAPI.Controllers
     public class BookingsController : ControllerBase
     {
         private readonly BookingRepository _bookingRepository;
+        private readonly CouponRepository _couponRepository;
 
-        public BookingsController(BookingRepository bookingRepository)
+        public BookingsController(BookingRepository bookingRepository, CouponRepository couponRepository)
         {
             _bookingRepository = bookingRepository;
+            _couponRepository = couponRepository;
         }
 
         [HttpGet]
@@ -38,6 +38,19 @@ namespace VezeetaAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> AddBooking(Booking booking)
         {
+            // Check if the booking applies a coupon
+            if (!string.IsNullOrEmpty(booking.CouponCode))
+            {
+                var coupon = await _couponRepository.GetCouponByCode(booking.CouponCode);
+                if (coupon != null)
+                {
+                    // Apply discount and update booking details
+                    booking.DiscountAmount = coupon.Discount;
+                    booking.DiscountApplied = true;
+                    await _couponRepository.Delete(coupon.Id); // Remove the used coupon
+                }
+            }
+
             await _bookingRepository.Add(booking);
             return Ok();
         }

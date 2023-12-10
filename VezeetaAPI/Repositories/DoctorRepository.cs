@@ -25,6 +25,12 @@ namespace VezeetaAPI.Repositories
         {
             return await _context.Doctors.ToListAsync();
         }
+        public async Task<List<Doctor>> GetDoctorsBySpecialization(string specialization)
+        {
+            return await _context.Doctors
+                .Where(d => d.Specialization == specialization )
+                .ToListAsync();
+        }
         public async Task<IEnumerable<Doctor>> SearchDoctors(DoctorSearchCriteria criteria)
         {
             var query = _context.Doctors.AsQueryable();
@@ -40,6 +46,7 @@ namespace VezeetaAPI.Repositories
 
             return await query.ToListAsync();
         }
+
         public async Task Add(Doctor doctor)
         {
             await _context.Doctors.AddAsync(doctor);

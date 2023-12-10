@@ -1,5 +1,9 @@
-using VezeetaAPI.Models;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using VezeetaAPI.Models;
+using VezeetaAPI.Repositories;
+using VezeetaAPI.Interfaces;
 
 namespace VezeetaAPI
 {
@@ -9,29 +13,41 @@ namespace VezeetaAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            //builder.Services.AddDbContext<VezeetaContext>(
-                //options => options.UseSqlServer(builder.Configuration.GetConnectionString("vezeetaConnection")));
+            // Adding the connection string
+            var connectionString = builder.Configuration.GetConnectionString("vezeetaConnection");
+            builder.Services.AddDbContext<VezeetaContext>(options => options.UseSqlServer(connectionString));
+
+            // Registering repositories
+            builder.Services.AddScoped<ICrudRepository<Doctor>, DoctorRepository>();
+            builder.Services.AddScoped<ICrudRepository<Patient>, PatientRepository>();
+            builder.Services.AddScoped<ICrudRepository<Booking>, BookingRepository>();
+            builder.Services.AddScoped<ICrudRepository<Coupon>, CouponRepository>();
+
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            // Swagger configuration
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Enabling Swagger for Development
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
+            // Middleware
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
+            app.UseRouting();
 
-
-            app.MapControllers();
+            // Endpoint routing
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
 
             app.Run();
         }
