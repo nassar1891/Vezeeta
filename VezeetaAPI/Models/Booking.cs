@@ -11,7 +11,15 @@ public partial class Booking
 
     public int? ScheduleId { get; set; }
 
+    public BookingState State { get; set; } // New property for booking state
+
     public virtual Patient? Patient { get; set; }
 
     public virtual Schedule? Schedule { get; set; }
+}
+public enum BookingState
+{
+    Pending,
+    Confirmed,
+    Denied,
 }
